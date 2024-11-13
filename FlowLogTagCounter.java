@@ -1,7 +1,5 @@
 import java.io.*;
-import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FlowLogTagCounter {
     public static void main(String[] args) {
@@ -27,6 +25,8 @@ public class FlowLogTagCounter {
             while ((lookupLine = lookupReader.readLine()) != null) {
                 String[] parts = lookupLine.split(",");
                 System.out.println(Arrays.toString(parts));
+
+                // Check if it contains 3 columns
                 if (parts.length == 3) {
                     String key = parts[0].trim() + "," + parts[1].trim().toLowerCase(); // Make key comparison case-insensitive
                     String tag = parts[2].trim();
@@ -42,10 +42,13 @@ public class FlowLogTagCounter {
             while ((flowLogLine = flowLogReader.readLine()) != null) {
                 String[] parts = flowLogLine.split("\\s+");
                 System.out.println(Arrays.toString(parts));
+
+                // Check if it at least contains the protocol and starts with version 2
                 if (parts.length >= 8 && parts[0].equals("2")) {
                     String dstPort = parts[6];
                     String protocol = mapProtocol(parts[7]);
                     String key = dstPort + "," + protocol;
+
                     // Determine tag
                     String tag = lookupTable.getOrDefault(key.toLowerCase(), "untagged"); // Compare in lowercase
                     tagCounts.put(tag, tagCounts.getOrDefault(tag, 0) + 1);
@@ -58,6 +61,8 @@ public class FlowLogTagCounter {
             
             // Write output
             PrintWriter writer = new PrintWriter(new FileWriter(outputFile));
+
+            // Tag Count Output
             writer.println("Tag Counts:");
             writer.println("Tag,Count");
             for (Map.Entry<String, Integer> entry : tagCounts.entrySet()) {
@@ -65,12 +70,15 @@ public class FlowLogTagCounter {
             }
 
             writer.println();
+
+            // Port/Protocol Combination Count Output
             writer.println("Port/Protocol Combination Counts:");
             writer.println("Port,Protocol,Count");
             for (Map.Entry<String, Integer> entry : portProtocolCounts.entrySet()) {
                 String[] keyParts = entry.getKey().split(",");
                 writer.println(keyParts[0] + "," + keyParts[1] + "," + entry.getValue());
             }
+
             System.out.println("Finished writing output to " + outputFile);
             writer.close();
 
@@ -91,6 +99,5 @@ public class FlowLogTagCounter {
             default:
                 return "unknown";
         }
-
     }
 }

@@ -9,6 +9,7 @@ Case-insensitive matching for dstport.
 Untagged logs are counted separately.
 The dst is inferred from the 7th column based on https://docs.aws.amazon.com/vpc/latest/userguide/flow-log-records.html.
 The protocol is inferred from the 8th column based on https://docs.aws.amazon.com/vpc/latest/userguide/flow-log-records.html.
+The protol numbers are from https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml, but for this program it's limited to tcp, udp, icmp or unknown.
 
 To run the program: 
 javac FlowLogTagCounter.java
